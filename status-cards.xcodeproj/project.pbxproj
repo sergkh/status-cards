@@ -1,0 +1,430 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		3777834C19D5A7500009055A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 3777834B19D5A7500009055A /* main.m */; };
+		3777834F19D5A7500009055A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 3777834E19D5A7500009055A /* AppDelegate.m */; };
+		3777835219D5A7500009055A /* status_cards.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 3777835019D5A7500009055A /* status_cards.xcdatamodeld */; };
+		3777835419D5A7500009055A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3777835319D5A7500009055A /* Images.xcassets */; };
+		3777835719D5A7500009055A /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3777835519D5A7500009055A /* MainMenu.xib */; };
+		3777836319D5A7500009055A /* status_cardsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3777836219D5A7500009055A /* status_cardsTests.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		3777835D19D5A7500009055A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3777833E19D5A7500009055A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3777834519D5A7500009055A;
+			remoteInfo = "status-cards";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		3777834619D5A7500009055A /* status-cards.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "status-cards.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		3777834A19D5A7500009055A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		3777834B19D5A7500009055A /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		3777834D19D5A7500009055A /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		3777834E19D5A7500009055A /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		3777835119D5A7500009055A /* status_cards.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = status_cards.xcdatamodel; sourceTree = "<group>"; };
+		3777835319D5A7500009055A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		3777835619D5A7500009055A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		3777835C19D5A7500009055A /* status-cardsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "status-cardsTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		3777836119D5A7500009055A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		3777836219D5A7500009055A /* status_cardsTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = status_cardsTests.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		3777834319D5A7500009055A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3777835919D5A7500009055A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		3777833D19D5A7500009055A = {
+			isa = PBXGroup;
+			children = (
+				3777834819D5A7500009055A /* status-cards */,
+				3777835F19D5A7500009055A /* status-cardsTests */,
+				3777834719D5A7500009055A /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		3777834719D5A7500009055A /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				3777834619D5A7500009055A /* status-cards.app */,
+				3777835C19D5A7500009055A /* status-cardsTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		3777834819D5A7500009055A /* status-cards */ = {
+			isa = PBXGroup;
+			children = (
+				3777834D19D5A7500009055A /* AppDelegate.h */,
+				3777834E19D5A7500009055A /* AppDelegate.m */,
+				3777835319D5A7500009055A /* Images.xcassets */,
+				3777835519D5A7500009055A /* MainMenu.xib */,
+				3777835019D5A7500009055A /* status_cards.xcdatamodeld */,
+				3777834919D5A7500009055A /* Supporting Files */,
+			);
+			path = "status-cards";
+			sourceTree = "<group>";
+		};
+		3777834919D5A7500009055A /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				3777834A19D5A7500009055A /* Info.plist */,
+				3777834B19D5A7500009055A /* main.m */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		3777835F19D5A7500009055A /* status-cardsTests */ = {
+			isa = PBXGroup;
+			children = (
+				3777836219D5A7500009055A /* status_cardsTests.m */,
+				3777836019D5A7500009055A /* Supporting Files */,
+			);
+			path = "status-cardsTests";
+			sourceTree = "<group>";
+		};
+		3777836019D5A7500009055A /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				3777836119D5A7500009055A /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		3777834519D5A7500009055A /* status-cards */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3777836619D5A7500009055A /* Build configuration list for PBXNativeTarget "status-cards" */;
+			buildPhases = (
+				3777834219D5A7500009055A /* Sources */,
+				3777834319D5A7500009055A /* Frameworks */,
+				3777834419D5A7500009055A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "status-cards";
+			productName = "status-cards";
+			productReference = 3777834619D5A7500009055A /* status-cards.app */;
+			productType = "com.apple.product-type.application";
+		};
+		3777835B19D5A7500009055A /* status-cardsTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3777836919D5A7500009055A /* Build configuration list for PBXNativeTarget "status-cardsTests" */;
+			buildPhases = (
+				3777835819D5A7500009055A /* Sources */,
+				3777835919D5A7500009055A /* Frameworks */,
+				3777835A19D5A7500009055A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				3777835E19D5A7500009055A /* PBXTargetDependency */,
+			);
+			name = "status-cardsTests";
+			productName = "status-cardsTests";
+			productReference = 3777835C19D5A7500009055A /* status-cardsTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		3777833E19D5A7500009055A /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0600;
+				ORGANIZATIONNAME = "Sergey Khruschak";
+				TargetAttributes = {
+					3777834519D5A7500009055A = {
+						CreatedOnToolsVersion = 6.0.1;
+					};
+					3777835B19D5A7500009055A = {
+						CreatedOnToolsVersion = 6.0.1;
+						TestTargetID = 3777834519D5A7500009055A;
+					};
+				};
+			};
+			buildConfigurationList = 3777834119D5A7500009055A /* Build configuration list for PBXProject "status-cards" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 3777833D19D5A7500009055A;
+			productRefGroup = 3777834719D5A7500009055A /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				3777834519D5A7500009055A /* status-cards */,
+				3777835B19D5A7500009055A /* status-cardsTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		3777834419D5A7500009055A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3777835419D5A7500009055A /* Images.xcassets in Resources */,
+				3777835719D5A7500009055A /* MainMenu.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3777835A19D5A7500009055A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		3777834219D5A7500009055A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3777834F19D5A7500009055A /* AppDelegate.m in Sources */,
+				3777834C19D5A7500009055A /* main.m in Sources */,
+				3777835219D5A7500009055A /* status_cards.xcdatamodeld in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3777835819D5A7500009055A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3777836319D5A7500009055A /* status_cardsTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		3777835E19D5A7500009055A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 3777834519D5A7500009055A /* status-cards */;
+			targetProxy = 3777835D19D5A7500009055A /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		3777835519D5A7500009055A /* MainMenu.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				3777835619D5A7500009055A /* Base */,
+			);
+			name = MainMenu.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		3777836419D5A7500009055A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		3777836519D5A7500009055A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		3777836719D5A7500009055A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = "status-cards/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		3777836819D5A7500009055A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = "status-cards/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		3777836A19D5A7500009055A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"$(inherited)",
+				);
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = "status-cardsTests/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/status-cards.app/Contents/MacOS/status-cards";
+			};
+			name = Debug;
+		};
+		3777836B19D5A7500009055A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = "status-cardsTests/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/status-cards.app/Contents/MacOS/status-cards";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		3777834119D5A7500009055A /* Build configuration list for PBXProject "status-cards" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3777836419D5A7500009055A /* Debug */,
+				3777836519D5A7500009055A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		3777836619D5A7500009055A /* Build configuration list for PBXNativeTarget "status-cards" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3777836719D5A7500009055A /* Debug */,
+				3777836819D5A7500009055A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		3777836919D5A7500009055A /* Build configuration list for PBXNativeTarget "status-cardsTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3777836A19D5A7500009055A /* Debug */,
+				3777836B19D5A7500009055A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		3777835019D5A7500009055A /* status_cards.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				3777835119D5A7500009055A /* status_cards.xcdatamodel */,
+			);
+			currentVersion = 3777835119D5A7500009055A /* status_cards.xcdatamodel */;
+			path = status_cards.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
+	};
+	rootObject = 3777833E19D5A7500009055A /* Project object */;
+}
