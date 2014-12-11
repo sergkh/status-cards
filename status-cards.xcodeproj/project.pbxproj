@@ -13,6 +13,7 @@
 		3777835419D5A7500009055A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3777835319D5A7500009055A /* Images.xcassets */; };
 		3777835719D5A7500009055A /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3777835519D5A7500009055A /* MainMenu.xib */; };
 		3777836319D5A7500009055A /* status_cardsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3777836219D5A7500009055A /* status_cardsTests.m */; };
+		37F2ECFE19D5B7ED00FE6016 /* DictionaryManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 37F2ECFD19D5B7ED00FE6016 /* DictionaryManager.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -32,11 +33,13 @@
 		3777834D19D5A7500009055A /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		3777834E19D5A7500009055A /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		3777835119D5A7500009055A /* status_cards.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = status_cards.xcdatamodel; sourceTree = "<group>"; };
-		3777835319D5A7500009055A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		3777835319D5A7500009055A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = "status-cards/Images.xcassets"; sourceTree = "<group>"; };
 		3777835619D5A7500009055A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		3777835C19D5A7500009055A /* status-cardsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "status-cardsTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3777836119D5A7500009055A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3777836219D5A7500009055A /* status_cardsTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = status_cardsTests.m; sourceTree = "<group>"; };
+		37F2ECFD19D5B7ED00FE6016 /* DictionaryManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DictionaryManager.m; sourceTree = "<group>"; };
+		37F2ED0019D5B82F00FE6016 /* DictionaryManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DictionaryManager.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -62,6 +65,7 @@
 			children = (
 				3777834819D5A7500009055A /* status-cards */,
 				3777835F19D5A7500009055A /* status-cardsTests */,
+				37F2ECFC19D5B5B100FE6016 /* ui */,
 				3777834719D5A7500009055A /* Products */,
 			);
 			sourceTree = "<group>";
@@ -78,10 +82,10 @@
 		3777834819D5A7500009055A /* status-cards */ = {
 			isa = PBXGroup;
 			children = (
+				37F2ED0019D5B82F00FE6016 /* DictionaryManager.h */,
+				37F2ECFD19D5B7ED00FE6016 /* DictionaryManager.m */,
 				3777834D19D5A7500009055A /* AppDelegate.h */,
 				3777834E19D5A7500009055A /* AppDelegate.m */,
-				3777835319D5A7500009055A /* Images.xcassets */,
-				3777835519D5A7500009055A /* MainMenu.xib */,
 				3777835019D5A7500009055A /* status_cards.xcdatamodeld */,
 				3777834919D5A7500009055A /* Supporting Files */,
 			);
@@ -112,6 +116,15 @@
 				3777836119D5A7500009055A /* Info.plist */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		37F2ECFC19D5B5B100FE6016 /* ui */ = {
+			isa = PBXGroup;
+			children = (
+				3777835319D5A7500009055A /* Images.xcassets */,
+				3777835519D5A7500009055A /* MainMenu.xib */,
+			);
+			name = ui;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -216,6 +229,7 @@
 				3777834F19D5A7500009055A /* AppDelegate.m in Sources */,
 				3777834C19D5A7500009055A /* main.m in Sources */,
 				3777835219D5A7500009055A /* status_cards.xcdatamodeld in Sources */,
+				37F2ECFE19D5B7ED00FE6016 /* DictionaryManager.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -244,6 +258,7 @@
 				3777835619D5A7500009055A /* Base */,
 			);
 			name = MainMenu.xib;
+			path = "status-cards";
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -402,6 +417,7 @@
 				3777836819D5A7500009055A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		3777836919D5A7500009055A /* Build configuration list for PBXNativeTarget "status-cardsTests" */ = {
 			isa = XCConfigurationList;
@@ -410,6 +426,7 @@
 				3777836B19D5A7500009055A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 

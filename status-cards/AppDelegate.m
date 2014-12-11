@@ -8,22 +8,52 @@
 
 #import "AppDelegate.h"
 
+#define kSources @"sources"
+#define kNotificationsEnabled @"notificationsEnabled"
+#define kPanelEnabled @"panelEnabled"
+
 @interface AppDelegate ()
 
-@property (weak) IBOutlet NSWindow *window;
-- (IBAction)saveAction:(id)sender;
+// @property (weak) IBOutlet NSWindow *window;
+//- (IBAction)quitAction:(id)sender;
 
 @end
 
 @implementation AppDelegate
 
+int leftToUpdateSources;
+
++(void)initialize {
+    NSDictionary *defaults = [NSDictionary dictionaryWithObjectsAndKeys:
+                              @NO, kNotificationsEnabled,
+                              @YES, kPanelEnabled,
+                              nil];
+    [[NSUserDefaults standardUserDefaults] registerDefaults:defaults];
+    leftToUpdateSources = 10;
+}
+
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
-    // Insert code here to initialize your application
+    self.statusItem = [[NSStatusBar systemStatusBar] statusItemWithLength:NSVariableStatusItemLength];
+    [self.statusItem setMenu:self.statusMenu];
+    [self.statusItem setTitle:@"T"]; // T is for translation )
+    [self.statusItem setHighlightMode:YES];
+    
+    NSManagedObjectContext* context = [self managedObjectContext];
+    self.dictionaryManager = [[DictionaryManager alloc] initWithManagedObjectContext:context];
+    
+    [self.repeatingTimer invalidate];
+    self.repeatingTimer = nil;
+    
+    [self updateSources];
+    [self changePairTimerActivated:nil];
 }
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification {
     // Insert code here to tear down your application
+    [self.repeatingTimer invalidate];
 }
+
+
 
 #pragma mark - Core Data stack
 
@@ -74,8 +104,8 @@
     
     if (!shouldFail && !error) {
         NSPersistentStoreCoordinator *coordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:[self managedObjectModel]];
-        NSURL *url = [applicationDocumentsDirectory URLByAppendingPathComponent:@"OSXCoreDataObjC.storedata"];
-        if (![coordinator addPersistentStoreWithType:NSXMLStoreType configuration:nil URL:url options:nil error:&error]) {
+        NSURL *url = [applicationDocumentsDirectory URLByAppendingPathComponent:@"OSXCoreDataObjC.storedata"]; // Core_Data.sqlite
+        if (![coordinator addPersistentStoreWithType:NSXMLStoreType configuration:nil URL:url options:nil error:&error]) { // NSSQLiteStoreType
             coordinator = nil;
         }
         _persistentStoreCoordinator = coordinator;
@@ -111,19 +141,122 @@
     return _managedObjectContext;
 }
 
-#pragma mark - Core Data Saving and Undo support
-
-- (IBAction)saveAction:(id)sender {
-    // Performs the save action for the application, which is to send the save: message to the application's managed object context. Any encountered errors are presented to the user.
-    if (![[self managedObjectContext] commitEditing]) {
-        NSLog(@"%@:%@ unable to commit editing before saving", [self class], NSStringFromSelector(_cmd));
+- (void)changePairTimerActivated:(NSTimer*)timer {
+    id dictionary = [self dictionaryManager];
+    
+    NSDictionary* pair = [dictionary nextPair];
+    
+    NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
+    
+    if (pair) {
+        if([prefs boolForKey:kNotificationsEnabled]) {
+            NSUserNotification *notification = [[NSUserNotification alloc] init];
+            notification.title = [pair objectForKey:@"word"];
+            notification.informativeText = [pair objectForKey:@"translation"];
+            // no sound: notification.soundName = NSUserNotificationDefaultSoundName;
+        
+            [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
+        } else {
+            NSLog(@"Notifications are disabled");
+        }
+        
+        if ([prefs boolForKey:kPanelEnabled]) {
+            [self.statusItem setTitle: [[NSString alloc] initWithFormat:@"%@ – %@", [pair objectForKey:@"word"], [pair objectForKey:@"translation"]]];
+        } else {
+            NSLog(@"Panel is disabled");
+        }
     }
     
-    NSError *error = nil;
-    if ([[self managedObjectContext] hasChanges] && ![[self managedObjectContext] save:&error]) {
-        [[NSApplication sharedApplication] presentError:error];
+    if(leftToUpdateSources-- == 0) {
+        leftToUpdateSources = 10;
+        [self updateSources];
+    }
+    
+    [self.repeatingTimer invalidate];
+    self.repeatingTimer = nil;
+    self.repeatingTimer = [NSTimer scheduledTimerWithTimeInterval:[self nextTimerInterval]
+                                     target:self selector:@selector(changePairTimerActivated:)
+                                     userInfo:[self dictionaryManager]
+                                     repeats:NO];
+}
+
+
+- (void)updateSources {
+    // TODO: update all registered sources
+    NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
+    
+    NSArray *sources = [prefs stringArrayForKey:kSources];
+    
+    NSLog(@"Updating sources %ld", [sources count]);
+    
+    for (NSString* path in sources) {
+        NSLog(@"Processing source: %@", path);
+        NSError* error = nil;
+        [self.dictionaryManager importFromURL:[NSURL URLWithString:path] error:&error];
     }
 }
+
+- (void)addSource:(NSURL*)url {
+    NSError* error = nil;
+    [self.dictionaryManager importFromURL:url error:&error];
+    
+    // add source to settings if not added already
+    NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
+    NSArray *sources = [prefs stringArrayForKey:kSources];
+    
+    NSString *newPath = [url absoluteString];
+    
+    for (NSString* path in sources) {
+        if ([path isEqualToString:newPath]) return ;
+    }
+    
+    NSArray* updatedSetting = sources ? [sources arrayByAddingObject:newPath] : [[NSArray alloc] initWithObjects:newPath, nil];
+    
+    [prefs setObject:updatedSetting forKey:kSources];
+    [prefs synchronize];
+    
+    NSLog(@"Added new source %@", url);
+}
+
+- (NSTimeInterval)nextTimerInterval {
+    NSTimeInterval interval = 60 + arc4random() % (60*1);
+    
+    // Logging:
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:@"HH:mm:ss"];
+    NSLog(@"Next show up at: %@ +(%f)", [dateFormatter stringFromDate:[[NSDate alloc] initWithTimeIntervalSinceNow:interval]], interval);
+    
+    return interval;
+}
+
+- (IBAction)importAction:(id)sender {
+    // Uncomment to clean up dictionay before import:
+    //[self.dictionaryManager removeAll];
+    
+    NSOpenPanel* openPanel = [NSOpenPanel openPanel];
+    
+    openPanel.title = @"Choose a file";
+    openPanel.showsResizeIndicator = YES;
+    openPanel.showsHiddenFiles = NO;
+    openPanel.canChooseDirectories = NO;
+    openPanel.canCreateDirectories = NO;
+    openPanel.allowsMultipleSelection = NO;
+    //openPanel.allowedFileTypes = @[@"txt"];
+
+    [openPanel beginWithCompletionHandler:^(NSInteger result) {
+        if (result == NSOKButton) {
+            NSURL *selection = openPanel.URLs[0];
+            NSString* path = [[NSString alloc] initWithFormat:@"file://%@", [selection.path stringByResolvingSymlinksInPath]];
+            [self addSource:[NSURL URLWithString:path]];
+        }
+    }];
+}
+
+- (IBAction)manageAccountsAction:(id)sender {
+    // [NSApp performSelector:@selector(terminate:) withObject:nil afterDelay:0.0];
+}
+
+#pragma mark - Core Data Saving and Undo support
 
 - (NSUndoManager *)windowWillReturnUndoManager:(NSWindow *)window {
     // Returns the NSUndoManager for the application. In this case, the manager returned is that of the managed object context for the application.
