@@ -104,8 +104,9 @@ int leftToUpdateSources;
     
     if (!shouldFail && !error) {
         NSPersistentStoreCoordinator *coordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:[self managedObjectModel]];
-        NSURL *url = [applicationDocumentsDirectory URLByAppendingPathComponent:@"OSXCoreDataObjC.storedata"]; // Core_Data.sqlite
-        if (![coordinator addPersistentStoreWithType:NSXMLStoreType configuration:nil URL:url options:nil error:&error]) { // NSSQLiteStoreType
+        NSURL *url = [applicationDocumentsDirectory URLByAppendingPathComponent:@"Core_Data.sqlite"];
+        NSLog(@"Storage url: %@", url);
+        if (![coordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:url options:nil error:&error]) {
             coordinator = nil;
         }
         _persistentStoreCoordinator = coordinator;
@@ -243,13 +244,10 @@ int leftToUpdateSources;
     openPanel.allowsMultipleSelection = NO;
     //openPanel.allowedFileTypes = @[@"txt"];
 
-    [openPanel beginWithCompletionHandler:^(NSInteger result) {
-        if (result == NSOKButton) {
-            NSURL *selection = openPanel.URLs[0];
-            NSString* path = [[NSString alloc] initWithFormat:@"file://%@", [selection.path stringByResolvingSymlinksInPath]];
-            [self addSource:[NSURL URLWithString:path]];
-        }
-    }];
+    if([openPanel runModal] == NSFileHandlingPanelOKButton) {
+        NSURL *selection = openPanel.URLs[0];
+        [self addSource:selection];
+    };
 }
 
 - (IBAction)manageAccountsAction:(id)sender {

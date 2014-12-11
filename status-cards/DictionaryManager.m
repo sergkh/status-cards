@@ -167,7 +167,7 @@
             return true;
         }
     } else {
-        NSLog(@"Words pair already exists in base: %@, %@", word, translation);
+        // silence, please NSLog(@"Words pair already exists in base: %@, %@", word, translation);
     }
     
     return false;
