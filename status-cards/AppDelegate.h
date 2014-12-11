@@ -25,6 +25,7 @@
 - (NSTimeInterval)nextTimerInterval;
 - (IBAction)importAction:(id)sender;
 - (IBAction)manageAccountsAction:(id)sender;
+- (IBAction)nextPair:(id)sender;
 
 - (void)addSource:(NSURL*)url;
 @end

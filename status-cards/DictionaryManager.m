@@ -118,7 +118,7 @@
     
     NSLog(@"Got %ld lines in file.", [fileLines count]);
     
-    NSCharacterSet* allowedDelimeters = [NSCharacterSet characterSetWithCharactersInString:@"-:–=—"];
+    NSCharacterSet* allowedDelimeters = [NSCharacterSet characterSetWithCharactersInString:@":–=—"];
     
     int importedCount = 0;
     
@@ -130,7 +130,10 @@
                 importedCount++;
             }
         } else {
-            NSLog(@"Ignored line: %@ with pairs: %ld", line, [pairsArray count]);
+            // skipe empty lines
+            if([[line stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] length] > 0) {
+                NSLog(@"Ignored line: %@ with pairs: %ld", line, [pairsArray count]);
+            }
         }
     }
     
@@ -142,7 +145,7 @@
     NSCharacterSet* spaces = [NSCharacterSet whitespaceCharacterSet];
     
     // trim spaces
-    NSString* word = [wordRaw stringByTrimmingCharactersInSet:spaces];
+    NSString* word = [[wordRaw stringByTrimmingCharactersInSet:spaces] lowercaseString];
     NSString* translation = [translationRaw stringByTrimmingCharactersInSet:spaces];
     
     // Check is pair already exists

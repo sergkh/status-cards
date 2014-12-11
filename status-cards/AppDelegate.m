@@ -250,6 +250,10 @@ int leftToUpdateSources;
     };
 }
 
+- (IBAction)nextPair:(id)sender {
+    [self changePairTimerActivated:nil];
+}
+
 - (IBAction)manageAccountsAction:(id)sender {
     // [NSApp performSelector:@selector(terminate:) withObject:nil afterDelay:0.0];
 }

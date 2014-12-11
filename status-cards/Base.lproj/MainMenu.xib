@@ -20,6 +20,11 @@
         <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
         <menu id="6o6-Ro-384">
             <items>
+                <menuItem title="Next" keyEquivalent="n" id="y2A-x4-EC3">
+                    <connections>
+                        <action selector="nextPair:" target="Voe-Tx-rLC" id="wQr-Kx-DTe"/>
+                    </connections>
+                </menuItem>
                 <menuItem title="Import File..." id="zFk-jg-603" userLabel="Import File...">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
