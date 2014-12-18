@@ -7,10 +7,13 @@
 //
 
 #import "AppDelegate.h"
+#import "LaunchOnLoginSupport.h"
+#import "PreferencesDialogController.h"
 
 #define kSources @"sources"
 #define kNotificationsEnabled @"notificationsEnabled"
 #define kPanelEnabled @"panelEnabled"
+#define kLaunchAtLoginEnabled @"launchAtLoginEnabled"
 
 @interface AppDelegate ()
 
@@ -27,6 +30,7 @@ int leftToUpdateSources;
     NSDictionary *defaults = [NSDictionary dictionaryWithObjectsAndKeys:
                               @NO, kNotificationsEnabled,
                               @YES, kPanelEnabled,
+                              @YES, kLaunchAtLoginEnabled,
                               nil];
     [[NSUserDefaults standardUserDefaults] registerDefaults:defaults];
     leftToUpdateSources = 10;
@@ -46,20 +50,27 @@ int leftToUpdateSources;
     
     [self updateSources];
     [self changePairTimerActivated:nil];
+    
+    // Check autostart
+    LaunchOnLoginSupport *autostart = [[LaunchOnLoginSupport alloc] init];
+    BOOL autostartEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:kLaunchAtLoginEnabled];
+
+    if(autostartEnabled != [autostart isLaunchAtStartup]) {
+        [autostart toggleLaunchAtStartup];
+        NSLog(@"Toggled autostart status to: %d", [autostart isLaunchAtStartup]);
+    }
 }
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification {
-    // Insert code here to tear down your application
     [self.repeatingTimer invalidate];
 }
-
-
 
 #pragma mark - Core Data stack
 
 @synthesize persistentStoreCoordinator = _persistentStoreCoordinator;
 @synthesize managedObjectModel = _managedObjectModel;
 @synthesize managedObjectContext = _managedObjectContext;
+@synthesize preferencesWindow;
 
 - (NSURL *)applicationDocumentsDirectory {
     // The directory the application uses to store the Core Data store file. This code uses a directory named "gmd.status_cards" in the user's Application Support directory.
@@ -254,7 +265,12 @@ int leftToUpdateSources;
     [self changePairTimerActivated:nil];
 }
 
-- (IBAction)manageAccountsAction:(id)sender {
+- (IBAction)preferencesAction:(id)sender {
+    // PreferencesDialogController *prefsController = [[PreferencesDialogController alloc] init];
+    
+    [NSApp runModalForWindow:preferencesWindow];
+    
+    
     // [NSApp performSelector:@selector(terminate:) withObject:nil afterDelay:0.0];
 }
 

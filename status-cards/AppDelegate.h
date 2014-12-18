@@ -16,6 +16,7 @@
 @property (readonly, strong, nonatomic) NSManagedObjectContext *managedObjectContext;
 
 @property (strong, nonatomic) IBOutlet NSMenu *statusMenu;
+@property (strong, nonatomic) IBOutlet NSWindow *preferencesWindow;
 @property (strong, nonatomic) NSStatusItem *statusItem;
 @property (weak) NSTimer *repeatingTimer;
 @property DictionaryManager *dictionaryManager;
@@ -24,7 +25,7 @@
 - (void)updateSources;
 - (NSTimeInterval)nextTimerInterval;
 - (IBAction)importAction:(id)sender;
-- (IBAction)manageAccountsAction:(id)sender;
+- (IBAction)preferencesAction:(id)sender;
 - (IBAction)nextPair:(id)sender;
 
 - (void)addSource:(NSURL*)url;
