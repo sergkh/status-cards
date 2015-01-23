@@ -28,5 +28,5 @@ Roadmap:
   - Lingualeo integration
   - Separation of different languages
 
-Ready build is [here](https://github.com/sergkh/status-cards/blob/master/builds/status-cards.zip). Just copy it in applicatioons and run.
+Ready build is [here](https://github.com/sergkh/status-cards/blob/master/builds/status-cards.zip). Just copy it in applications folder and run.
 
