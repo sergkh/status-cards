@@ -70,7 +70,7 @@ int leftToUpdateSources;
 @synthesize persistentStoreCoordinator = _persistentStoreCoordinator;
 @synthesize managedObjectModel = _managedObjectModel;
 @synthesize managedObjectContext = _managedObjectContext;
-@synthesize preferencesWindow;
+@synthesize preferencesController = _preferencesController;
 
 - (NSURL *)applicationDocumentsDirectory {
     // The directory the application uses to store the Core Data store file. This code uses a directory named "gmd.status_cards" in the user's Application Support directory.
@@ -266,10 +266,13 @@ int leftToUpdateSources;
 }
 
 - (IBAction)preferencesAction:(id)sender {
-    // PreferencesDialogController *prefsController = [[PreferencesDialogController alloc] init];
+    if([self preferencesController] == nil) {
+        self.preferencesController = [[PreferencesDialogController alloc] initWithWindowNibName:@"Preferences"];
+    }
     
-    [NSApp runModalForWindow:preferencesWindow];
+    [[self preferencesController] showWindow:self];
     
+
     
     // [NSApp performSelector:@selector(terminate:) withObject:nil afterDelay:0.0];
 }

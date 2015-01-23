@@ -9,6 +9,8 @@
 #import <Cocoa/Cocoa.h>
 #import "DictionaryManager.h"
 
+@class PreferencesDialogController;
+
 @interface AppDelegate : NSObject <NSApplicationDelegate>
 
 @property (readonly, strong, nonatomic) NSPersistentStoreCoordinator *persistentStoreCoordinator;
@@ -16,10 +18,10 @@
 @property (readonly, strong, nonatomic) NSManagedObjectContext *managedObjectContext;
 
 @property (strong, nonatomic) IBOutlet NSMenu *statusMenu;
-@property (strong, nonatomic) IBOutlet NSWindow *preferencesWindow;
 @property (strong, nonatomic) NSStatusItem *statusItem;
 @property (weak) NSTimer *repeatingTimer;
 @property DictionaryManager *dictionaryManager;
+@property PreferencesDialogController *preferencesController;
 
 - (void)changePairTimerActivated:(NSTimer*)timer;
 - (void)updateSources;

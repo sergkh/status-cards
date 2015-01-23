@@ -13,6 +13,7 @@
 		3777835419D5A7500009055A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3777835319D5A7500009055A /* Images.xcassets */; };
 		3777835719D5A7500009055A /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3777835519D5A7500009055A /* MainMenu.xib */; };
 		3777836319D5A7500009055A /* status_cardsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3777836219D5A7500009055A /* status_cardsTests.m */; };
+		37A54E241A496F4500D50F66 /* Preferences.xib in Resources */ = {isa = PBXBuildFile; fileRef = 37A54E231A496F4500D50F66 /* Preferences.xib */; };
 		37BCDF381A4301C30043CC21 /* LaunchOnLoginSupport.m in Sources */ = {isa = PBXBuildFile; fileRef = 37BCDF371A4301C30043CC21 /* LaunchOnLoginSupport.m */; };
 		37BCDF3E1A4313CD0043CC21 /* PreferencesDialogController.m in Sources */ = {isa = PBXBuildFile; fileRef = 37BCDF3D1A4313CD0043CC21 /* PreferencesDialogController.m */; };
 		37F26A1A1A3B2BBA0053A673 /* PreferencePanes.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37F26A191A3B2BBA0053A673 /* PreferencePanes.framework */; };
@@ -41,6 +42,7 @@
 		3777835C19D5A7500009055A /* status-cardsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "status-cardsTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3777836119D5A7500009055A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3777836219D5A7500009055A /* status_cardsTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = status_cardsTests.m; sourceTree = "<group>"; };
+		37A54E231A496F4500D50F66 /* Preferences.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = Preferences.xib; sourceTree = "<group>"; };
 		37BCDF361A4301C30043CC21 /* LaunchOnLoginSupport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LaunchOnLoginSupport.h; sourceTree = "<group>"; };
 		37BCDF371A4301C30043CC21 /* LaunchOnLoginSupport.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LaunchOnLoginSupport.m; sourceTree = "<group>"; };
 		37BCDF3C1A4313CD0043CC21 /* PreferencesDialogController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PreferencesDialogController.h; sourceTree = "<group>"; };
@@ -137,6 +139,7 @@
 			children = (
 				3777835319D5A7500009055A /* Images.xcassets */,
 				3777835519D5A7500009055A /* MainMenu.xib */,
+				37A54E231A496F4500D50F66 /* Preferences.xib */,
 			);
 			name = ui;
 			sourceTree = "<group>";
@@ -222,6 +225,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3777835419D5A7500009055A /* Images.xcassets in Resources */,
+				37A54E241A496F4500D50F66 /* Preferences.xib in Resources */,
 				3777835719D5A7500009055A /* MainMenu.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

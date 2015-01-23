@@ -11,4 +11,6 @@
 
 @interface PreferencesDialogController : NSWindowController
 
+@property (strong, nonatomic) IBOutlet NSView *targetView;
+
 @end

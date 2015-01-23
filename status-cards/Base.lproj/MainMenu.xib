@@ -14,38 +14,10 @@
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <customObject id="Voe-Tx-rLC" customClass="AppDelegate">
             <connections>
-                <outlet property="preferencesWindow" destination="Z2i-SR-UjG" id="rUc-27-urR"/>
                 <outlet property="statusMenu" destination="6o6-Ro-384" id="kKl-Gz-jIu"/>
-                <outlet property="window" destination="Z2i-SR-UjG" id="HmZ-8M-NZB"/>
             </connections>
         </customObject>
         <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
-        <window title="Preferences" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="Z2i-SR-UjG">
-            <windowStyleMask key="styleMask" titled="YES" closable="YES" unifiedTitleAndToolbar="YES"/>
-            <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="283" y="305" width="604" height="331"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
-            <view key="contentView" id="VMY-MK-8J7">
-                <rect key="frame" x="0.0" y="0.0" width="604" height="331"/>
-                <autoresizingMask key="autoresizingMask"/>
-            </view>
-            <toolbar key="toolbar" implicitIdentifier="B156B504-0C92-4FCC-95A3-07023B1E0125" autosavesConfiguration="NO" displayMode="iconAndLabel" sizeMode="regular" id="RXy-eH-E38">
-                <allowedToolbarItems>
-                    <toolbarItem implicitItemIdentifier="NSToolbarShowColorsItem" id="4zI-LL-Pv3"/>
-                    <toolbarItem implicitItemIdentifier="NSToolbarShowFontsItem" id="vl2-Mg-kmB"/>
-                    <toolbarItem implicitItemIdentifier="NSToolbarPrintItem" id="T2D-mx-R2I"/>
-                    <toolbarItem implicitItemIdentifier="NSToolbarSpaceItem" id="sOI-DC-cdm"/>
-                    <toolbarItem implicitItemIdentifier="NSToolbarFlexibleSpaceItem" id="b2u-dy-igM"/>
-                </allowedToolbarItems>
-                <defaultToolbarItems>
-                    <toolbarItem reference="4zI-LL-Pv3"/>
-                    <toolbarItem reference="vl2-Mg-kmB"/>
-                    <toolbarItem reference="b2u-dy-igM"/>
-                    <toolbarItem reference="T2D-mx-R2I"/>
-                </defaultToolbarItems>
-            </toolbar>
-            <point key="canvasLocation" x="334" y="498.5"/>
-        </window>
         <menu id="6o6-Ro-384">
             <items>
                 <menuItem title="Next" keyEquivalent="n" id="y2A-x4-EC3">
