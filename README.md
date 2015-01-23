@@ -26,6 +26,7 @@ Roadmap:
 
   - Preferences dialog for managing datasources, settings and dictionaires.
   - Lingualeo integration
+  - Separation of different languages
 
 
 
