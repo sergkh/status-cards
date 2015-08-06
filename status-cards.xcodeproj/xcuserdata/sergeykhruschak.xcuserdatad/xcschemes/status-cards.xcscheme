@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "0600"
+   LastUpgradeVersion = "0620"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "3777834519D5A7500009055A"
+               BlueprintIdentifier = "37DCEDEF1AD3115B000B46CD"
                BuildableName = "status-cards.app"
                BlueprintName = "status-cards"
                ReferencedContainer = "container:status-cards.xcodeproj">
@@ -28,7 +28,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "3777835B19D5A7500009055A"
+               BlueprintIdentifier = "37DCEE041AD3115B000B46CD"
                BuildableName = "status-cardsTests.xctest"
                BlueprintName = "status-cardsTests"
                ReferencedContainer = "container:status-cards.xcodeproj">
@@ -46,7 +46,7 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "3777835B19D5A7500009055A"
+               BlueprintIdentifier = "37DCEE041AD3115B000B46CD"
                BuildableName = "status-cardsTests.xctest"
                BlueprintName = "status-cardsTests"
                ReferencedContainer = "container:status-cards.xcodeproj">
@@ -56,7 +56,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "3777834519D5A7500009055A"
+            BlueprintIdentifier = "37DCEDEF1AD3115B000B46CD"
             BuildableName = "status-cards.app"
             BlueprintName = "status-cards"
             ReferencedContainer = "container:status-cards.xcodeproj">
@@ -72,10 +72,11 @@
       ignoresPersistentStateOnLaunch = "NO"
       debugDocumentVersioning = "YES"
       allowLocationSimulation = "YES">
-      <BuildableProductRunnable>
+      <BuildableProductRunnable
+         runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "3777834519D5A7500009055A"
+            BlueprintIdentifier = "37DCEDEF1AD3115B000B46CD"
             BuildableName = "status-cards.app"
             BlueprintName = "status-cards"
             ReferencedContainer = "container:status-cards.xcodeproj">
@@ -90,10 +91,11 @@
       useCustomWorkingDirectory = "NO"
       buildConfiguration = "Release"
       debugDocumentVersioning = "YES">
-      <BuildableProductRunnable>
+      <BuildableProductRunnable
+         runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "3777834519D5A7500009055A"
+            BlueprintIdentifier = "37DCEDEF1AD3115B000B46CD"
             BuildableName = "status-cards.app"
             BlueprintName = "status-cards"
             ReferencedContainer = "container:status-cards.xcodeproj">
