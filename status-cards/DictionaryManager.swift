@@ -15,142 +15,151 @@ class DictionaryManager {
         self.managedContext = context
     }
     
-    func nextPair() -> Word? {
+    func nextPair() -> Pair? {
         // Fetching
-        let request = NSFetchRequest(entityName: "Word")
+        let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Pair")
         let sortByViewDate = NSSortDescriptor(key: "lastShown", ascending: true)
         let sortByViews = NSSortDescriptor(key: "shownTimes", ascending: true)
         
         request.sortDescriptors = [sortByViewDate, sortByViews]
         request.fetchLimit = 1
         
-        var error: NSError?
-        
-        let result = self.managedContext.executeFetchRequest(request, error: &error)
-        
-        if let err = error {
-            println("Error fetching data \(err) \(err.localizedDescription)")
-            return nil
-        }
+        let result = try? self.managedContext.fetch(request)
         
         if let res = result {
             if res.count == 0 {
-                println("No records found")
+                print("No records found")
                 return nil
             }
             
-            let word = res[0] as! Word
-            word.shownTimes += 1
-            word.lastShown = NSDate().timeIntervalSince1970
+            let pair = res[0] as! Pair
+            pair.shownTimes += 1
+            pair.lastShown = Date().timeIntervalSince1970
             
-            managedContext.save(&error)
-
-            if let err = error {
-                println("Unable to update managed object context \(err): \(err.localizedDescription)")
+            // TODO: do not save context on each read
+            do {
+                try managedContext.save()
+            } catch {
+                print("Error saving context \(error.localizedDescription)")
             }
             
-            println("Got word: \(word.word)")
+            print("Got pair: \(pair.displayText())")
             
-            return word;
+            return pair
         }
         
         return nil
     }
     
-    func importFromURL(url: NSURL, error: NSErrorPointer) {
+    func importFromURL(_ url: URL) throws {
         if url.scheme == "file" {
-            self.importFromFile(url.path!, params: parseUrlParams(url), error: error)
+            try self.importFromFile(url.path, params: parseUrlParams(url))
         } else {
-            println("URL is not supported Yet \(url)")
+            print("URL is not supported Yet \(url)")
         }
     }
     
-    func importFromFile(fileName: String, params: [String:String], error: NSErrorPointer) {
-        println("Importing file: \(fileName)")
-    
-        let fileContents = NSString(contentsOfFile:fileName, encoding: NSUTF8StringEncoding, error:error)
+    func importFromFile(_ fileName: String, params: [String:String]) throws {
+        print("Importing file: \(fileName)")
         
-        if let err = error.memory {
-            println("Error reading file: \(fileName), error \(err) : \(err.localizedDescription)")
-        }
-
+        let fileContents = try? NSString(contentsOfFile:fileName, encoding: String.Encoding.utf8.rawValue)
+        
         if let contents = fileContents {
-            let fileLines = contents.componentsSeparatedByString("\n")
-            println("Got \(fileLines.count) lines in file")
+            let fileLines = contents.components(separatedBy: "\n")
+            print("Got \(fileLines.count) lines in file")
             
             //let langLine = fileLines[0]
             
             //fromLang: Language, toLang: Language,
-            let fromLang = findOrAddLang(params["from"] ?? "en")
-            let toLang = findOrAddLang(params["to"] ?? "uk")
+            let fromLang = try findOrAddLang(params["from"] ?? "en")
+            let toLang = try findOrAddLang(params["to"] ?? "uk")
             
-            let allowedDelimeters = NSCharacterSet(charactersInString:":–=—")
-            let spaces = NSCharacterSet.whitespaceCharacterSet()
+            let allowedDelimeters = CharacterSet(charactersIn:":–=—")
+            let spaces = CharacterSet.whitespaces
             
             var importedCount = 0
             
             for line in fileLines {
-                let pairsArray = line.componentsSeparatedByCharactersInSet(allowedDelimeters) as! Array<String>
+                let pairsArray = line.components(separatedBy: allowedDelimeters as CharacterSet)
                 
                 if pairsArray.count == 2 {
-                    let words = pairsArray[0].componentsSeparatedByString(",")
-                    let translations = pairsArray[1].componentsSeparatedByString(",")
+                    let words = pairsArray[0].components(separatedBy: ",")
+                    let translations = pairsArray[1].components(separatedBy: ",")
                     
                     for w in words {
                         for t in translations {
-                            let word = Word(word: w.stringByTrimmingCharactersInSet(spaces), lang: fromLang, context: managedContext)
-                            let translation = Word(word: t.stringByTrimmingCharactersInSet(spaces), lang: toLang, context: managedContext)
+                            let trimmedWord1 = w.trimmingCharacters(in: spaces)
+                            let trimmedWord2 = t.trimmingCharacters(in: spaces)
                             
-                            if addPair(word, translation: translation, error:error) {
-                                importedCount++;
+                            do {
+                                if try !trimmedWord1.isEmpty && !trimmedWord2.isEmpty && addPair(word1: trimmedWord1, lang1: fromLang, word2: trimmedWord2, lang2: toLang) {
+                                    importedCount = importedCount + 1
+                                }
+                            } catch {
+                                print("Error storing word pair: \(error.localizedDescription) for words '\(trimmedWord1)' – '\(trimmedWord2)'")
                             }
                         }
                     }
                 } else {
                     // skip empty lines
-                    if !line.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceCharacterSet()).isEmpty {
-                        println("Ignored line: \(line) with pairs: \(pairsArray.count)")
+                    if !line.trimmingCharacters(in: NSCharacterSet.whitespaces).isEmpty {
+                        print("Ignored line: \(line) with pairs: \(pairsArray.count)")
                     }
                 }
-            }
+            }        
             
-            println("Imported \(importedCount) of total \(fileLines.count) lines from file: \(fileName)")
+            print("Imported \(importedCount) of total \(fileLines.count) lines from file: \(fileName)")
         }
     }
     
-    func addPair(word: Word, translation: Word, error: NSErrorPointer) -> Bool {
-        let storedWord = findWord(word.word, lang: word.language)
-        let translationRecord = findWord(translation.word, lang: translation.language) ?? translation
+    func addPair(word1: String, lang1: Language, word2: String, lang2: Language) throws -> Bool {
+        let word1Entity = try findWord(word: word1, lang: lang1) ?? Word(word: word1, lang: lang1, context: managedContext)
+        let word2Entity = try findWord(word: word2, lang: lang2) ?? Word(word: word2, lang: lang2, context: managedContext)
         
-        (storedWord ?? word).translation.addObject(translationRecord)
+        let existingPair = try findPair(word1: word1Entity, word2: word2Entity)
 
-        managedContext.save(error);
-        
-        return (storedWord == nil)
-    }
-    
-    func findWord(word: String, lang: Language) -> Word? {
-        let request = NSFetchRequest(entityName: "Word")
-        request.predicate = NSPredicate(format: "word=%@", argumentArray: [word])
-        
-        let wordsRes = managedContext.executeFetchRequest(request, error: nil);
-        
-        if let result = wordsRes {
-            if result.count == 0 {
-                return nil
-            }
-            
-            return result[0] as? Word
+        if (existingPair != nil) {
+            return false
         }
         
-        return nil;
+        _ = Pair(word1: word1Entity, word2: word2Entity, context: managedContext)
+        
+        try managedContext.save()
+        
+        return true
     }
     
-    func findOrAddLang(iso: String) -> Language {
-        let request = NSFetchRequest(entityName: "Language")
-        request.predicate = NSPredicate(format: "iso=%@", argumentArray: [iso])
+    func findPair(word1: Word, word2: Word) throws -> Pair? {
+        let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Pair")
+        request.predicate = NSPredicate(format: "word1 == %@ AND word2 == %@", word1, word2)
         
-        let langRes = managedContext.executeFetchRequest(request, error: nil);
+        let pairRes = try managedContext.fetch(request)
+        
+        if pairRes.count == 0 {
+            return nil
+        }
+        
+        return pairRes[0] as? Pair
+    }
+    
+    func findWord(word: String, lang: Language) throws -> Word? {
+        let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Word")
+        request.predicate = NSPredicate(format: "word == %@", word)
+        
+        let wordsRes = try managedContext.fetch(request)
+        
+        if wordsRes.count == 0 {
+            return nil
+        }
+            
+        return wordsRes[0] as? Word
+    }
+    
+    func findOrAddLang(_ iso: String) throws -> Language {
+        let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Language")
+        request.predicate = NSPredicate(format: "iso == %@", iso)
+        
+        let langRes = try? managedContext.fetch(request)
         
         if let result = langRes {
             if result.count > 0 {
@@ -160,34 +169,37 @@ class DictionaryManager {
         
         let l = Language(iso: iso, context: managedContext)
         
-        managedContext.save(nil)
+        try managedContext.save()
         
         return l
     }
     
-    func removeAll() {
-        let allWords = NSFetchRequest(entityName: "Word")
-        allWords.includesPropertyValues = false
-
-        var error: NSError? = nil
-        let pairs = self.managedContext.executeFetchRequest(allWords, error: &error)
-        
-        for p in pairs! {
-            managedContext.deleteObject(p as! NSManagedObject)
-        }
-        
-        managedContext.save(&error)
+    func countAll() throws -> Int {
+        return try managedContext.count(for: NSFetchRequest<NSFetchRequestResult>(entityName: "Word"))
     }
     
-    private func parseUrlParams(url: NSURL) -> [String : String] {
-        let urlComponents = NSURLComponents(URL: url, resolvingAgainstBaseURL: false)
-        let itemsOpt = urlComponents?.queryItems as? [NSURLQueryItem]
+    func removeAll() throws {
+        let allWords = NSFetchRequest<NSFetchRequestResult>(entityName: "Word")
+        allWords.includesPropertyValues = false
+
+        let pairs = try self.managedContext.fetch(allWords)
+        
+        for p in pairs {
+           managedContext.delete(p as! NSManagedObject)
+        }
+        
+        try managedContext.save()
+    }
+    
+    fileprivate func parseUrlParams(_ url: URL) -> [String : String] {
+        let urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false)
+        let itemsOpt = urlComponents?.queryItems
 
         var dict = [String: String]()
         
         if let items = itemsOpt {
             for item in items {
-                dict[item.name] = item.value()
+                dict[item.name] = item.value
             }
         }
         
