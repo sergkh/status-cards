@@ -2,12 +2,12 @@
 //  status_cardsTests.swift
 //  status-cardsTests
 //
-//  Created by Sergey Khruschak on 4/6/15.
-//  Copyright (c) 2015 Sergey Khruschak. All rights reserved.
+//  Created by Sergey Khruschak on 9/28/17.
+//  Copyright © 2017 Sergey Khruschak. All rights reserved.
 //
 
-import Cocoa
 import XCTest
+@testable import status_cards
 
 class status_cardsTests: XCTestCase {
     
@@ -23,12 +23,12 @@ class status_cardsTests: XCTestCase {
     
     func testExample() {
         // This is an example of a functional test case.
-        XCTAssert(true, "Pass")
+        // Use XCTAssert and related functions to verify your tests produce the correct results.
     }
     
     func testPerformanceExample() {
         // This is an example of a performance test case.
-        self.measure() {
+        self.measure {
             // Put the code you want to measure the time of here.
         }
     }

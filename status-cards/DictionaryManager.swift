@@ -112,6 +112,45 @@ class DictionaryManager {
         }
     }
     
+    func importFromLingualeo(login: String, pass: String) throws {
+        let url = URL(string: "https://api.lingualeo.com/api/login")
+        let json = ["username":login, "password": pass]
+        
+        var request = URLRequest(url: url!)
+        request.httpMethod = "POST"
+        request.httpBody = try JSONSerialization.data(withJSONObject: json, options: [])
+        request.setValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
+        
+        let task = URLSession.shared.dataTask(with: request as URLRequest){ data, response, error in
+            if error != nil {
+                print(error?.localizedDescription)
+                return
+            }
+            
+            do {
+                let json = try JSONSerialization.jsonObject(with: data!, options: .mutableContainers) as? NSDictionary
+                
+                if let parseJSON = json {
+                    let resultValue:String = parseJSON["success"] as! String;
+                    print("result: \(resultValue)")
+                    print(parseJSON)
+                }
+            } catch let error as NSError {
+                print(error)
+            }
+        }
+        
+        task.resume()
+        
+        /*
+        NSURLConnection.sendAsynchronousRequest(request, queue: OperationQueue.main) {(response, data, error) in
+            print(data!)
+            
+          //curl -X POST -H 'Content-Type: application/json' --data '{ "page": "1", "sortBy": "date", "filter": "all", "groupId": "dictionary"}' https://lingualeo.com/userdict/json
+        }*/
+        
+    }
+    
     func addPair(word1: String, lang1: Language, word2: String, lang2: Language) throws -> Bool {
         let word1Entity = try findWord(word: word1, lang: lang1) ?? Word(word: word1, lang: lang1, context: managedContext)
         let word2Entity = try findWord(word: word2, lang: lang2) ?? Word(word: word2, lang: lang2, context: managedContext)

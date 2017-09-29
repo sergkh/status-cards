@@ -21,5 +21,4 @@ class Word: NSManagedObject {
         self.language = lang
     }
     
-
 }
