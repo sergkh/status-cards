@@ -13,6 +13,7 @@ import CoreData
 class Language: NSManagedObject {
 
     @NSManaged var iso: String
+    @NSManaged var native: Bool
     @NSManaged var pairs: NSSet
     
     convenience init(iso: String, context: NSManagedObjectContext!) {

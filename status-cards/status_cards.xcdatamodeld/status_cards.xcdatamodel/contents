@@ -1,24 +1,27 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="11542" systemVersion="16G29" minimumToolsVersion="Xcode 4.3" sourceLanguage="Objective-C" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="16119" systemVersion="19E287" minimumToolsVersion="Xcode 4.3" sourceLanguage="Objective-C" userDefinedModelVersionIdentifier="">
+    <entity name="KnownWord" syncable="YES">
+        <attribute name="added" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="word" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="language" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Language" syncable="YES"/>
+    </entity>
     <entity name="Language" representedClassName="Language" syncable="YES">
         <attribute name="iso" attributeType="String" minValueString="2" maxValueString="6" syncable="YES"/>
+        <attribute name="native" optional="YES" attributeType="Boolean" usesScalarValueType="NO" syncable="YES"/>
         <relationship name="words" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Word" inverseName="language" inverseEntity="Word" syncable="YES"/>
     </entity>
-    <entity name="Pair" representedClassName="Pair" syncable="YES">
-        <attribute name="lastShown" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
-        <attribute name="shownTimes" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="NO" syncable="YES"/>
-        <relationship name="word1" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Word" inverseName="pairs_from" inverseEntity="Word" syncable="YES"/>
-        <relationship name="word2" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Word" inverseName="pairs_to" inverseEntity="Word" syncable="YES"/>
-    </entity>
     <entity name="Word" representedClassName="Word" syncable="YES">
+        <attribute name="added" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="definition" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="knownPercent" attributeType="Integer 16" defaultValueString="0.0" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="lastShown" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="shownTimes" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="word" attributeType="String" minValueString="1" maxValueString="512" indexed="YES" syncable="YES"/>
         <relationship name="language" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Language" inverseName="words" inverseEntity="Language" syncable="YES"/>
-        <relationship name="pairs_from" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Pair" inverseName="word1" inverseEntity="Pair" syncable="YES"/>
-        <relationship name="pairs_to" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Pair" inverseName="word2" inverseEntity="Pair" syncable="YES"/>
     </entity>
     <elements>
-        <element name="Language" positionX="-63" positionY="-18" width="128" height="75"/>
-        <element name="Pair" positionX="-54" positionY="45" width="128" height="105"/>
-        <element name="Word" positionX="-54" positionY="-9" width="128" height="105"/>
+        <element name="Language" positionX="-63" positionY="-18" width="128" height="88"/>
+        <element name="Word" positionX="-54" positionY="-9" width="128" height="148"/>
+        <element name="KnownWord" positionX="-63" positionY="36" width="128" height="88"/>
     </elements>
 </model>

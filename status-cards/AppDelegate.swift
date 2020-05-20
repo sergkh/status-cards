@@ -8,6 +8,7 @@
 
 import Cocoa
 import CoreData
+import Foundation
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
@@ -18,13 +19,18 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     let panelEnabled = "panelEnabled"
     let launchAtLoginEnabled = "launchAtLoginEnabled"
     
-    var statusItem: NSStatusItem
     var dictionaryManager: DictionaryManager?
     var repeatingTimer: Timer?
     
     let timerTolerance = TimeInterval(60*5) // 5 min
     
     lazy var coreData = CoreDataStack()
+    
+    var statusItem: NSStatusItem?
+    @IBOutlet weak var statusBarMenu: NSMenu?
+    @IBOutlet weak var importDictMenuItem: NSMenuItem?
+    @IBOutlet weak var settingsMenuItem: NSMenuItem?
+    @IBOutlet weak var exitMenuItem: NSMenuItem?
     
     override init() {
         let defaults = [
@@ -34,23 +40,21 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         ];
         
         UserDefaults.standard.register(defaults: defaults)
-        let length: CGFloat = -1
-        statusItem = NSStatusBar.system().statusItem(withLength: length)
     }
 
-    func changePairTimerActivated() {
+    @objc func changePairTimerActivated() {
         let dictionary = self.dictionaryManager
     
-        let maybePair = dictionary?.nextPair()
+        let maybeWord = dictionary?.nextWord()
         
         let prefs = UserDefaults.standard
     
-        if let pair = maybePair {
+        if let word = maybeWord {
             
             if prefs.bool(forKey: notificationsEnabled) {
                 let notification = NSUserNotification()
-                notification.title = pair.word1.word
-                notification.informativeText = pair.word2.word
+                notification.title = word.word
+                notification.informativeText = word.definition
                 // no sound: notification.soundName = NSUserNotificationDefaultSoundName;
                 print("Notifications are enabled")
                 NSUserNotificationCenter.default.deliver(notification)
@@ -60,7 +64,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
             if prefs.bool(forKey: panelEnabled) {
                 print("Setting status")
-                self.statusItem.title = pair.displayText()
+                self.statusItem?.button?.title = word.displayText()
             } else {
                 print("Panel is disabled");
             }
@@ -123,9 +127,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
             for path in sources {
                 print("Processing source: \(path)")
-                if let url = NSURL(string: path) {
+                //if let url = NSURL(string: path) {
                     //self.dictionaryManager?.importFromURL(url, fromLang: 0, toLang: 0, error:&error);
-                }
+                //}
             }
         }
     }
@@ -136,6 +140,26 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         coreData.load { 
             self.dictionaryManager = DictionaryManager(context: self.coreData.managedObjectContext)
             self.startTimer() // start the timer
+            
+            if let filepath = Bundle.main.path(forResource: "basic_en", ofType: "txt") {
+                do {
+                    let fileContents = try? String(contentsOfFile:filepath, encoding: .utf8)
+                               
+                    if let file = fileContents {
+                       let lang = try self.dictionaryManager?.findOrAddLang("en")
+                       
+                       for word in file.split(separator: ",", omittingEmptySubsequences: true) {
+                        
+                            let old = try self.dictionaryManager?.addKnownWord(word: String(word), lang: lang!)
+                            if (old != nil) {
+                                break ;
+                            }
+                       }
+                   }
+                } catch {
+                    
+                }
+            }
         }
         
         // Check autostart
@@ -147,14 +171,16 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             print("Toggled autostart status to: \(autostart.applicationIsInStartUpItems())")
         }
         
-        let languages: NSArray? = Locale.isoLanguageCodes as NSArray?
-        let locale = Locale.autoupdatingCurrent
+        //let languages: NSArray? = Locale.isoLanguageCodes as NSArray?
+        //let locale = Locale.autoupdatingCurrent
+    }
+    
+    override func awakeFromNib() {
+        super.awakeFromNib()
         
-        for code in languages! {
-            print("\(code) – \((locale as NSLocale).displayName(forKey: NSLocale.Key.identifier, value: code))")
-        }
-        
-        statusItem.title = "test"
+        statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+        statusItem?.button?.title = "📔"
+        statusItem?.menu = statusBarMenu
     }
 
     func applicationWillTerminate(_ aNotification: Notification) {
@@ -171,7 +197,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         let openPanel = NSOpenPanel()
         
-        openPanel.title = "Choose a file" // localize me
+        openPanel.title = "Choose a dictionary" // TODO: localize me
         openPanel.showsResizeIndicator = true
         openPanel.showsHiddenFiles = false
         openPanel.canChooseDirectories = false
@@ -179,10 +205,41 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         openPanel.allowsMultipleSelection = false
         //openPanel.allowedFileTypes = ["txt"];
         
-        if (openPanel.runModal() == NSFileHandlingPanelOKButton) {
+        if (openPanel.runModal() == NSApplication.ModalResponse.OK) {
             let selection = openPanel.urls[0] 
             self.addSource(selection) // TODO: add languages here
         }        
+    }
+    
+    @IBAction func openTextAction(_ sender: AnyObject) {
+        let openPanel = NSOpenPanel()
+        
+        openPanel.title = "Choose a subtitles file" // TODO: localize me
+        openPanel.showsResizeIndicator = true
+        openPanel.showsHiddenFiles = false
+        openPanel.canChooseDirectories = false
+        openPanel.canCreateDirectories = false
+        openPanel.allowsMultipleSelection = false
+        openPanel.allowedFileTypes = ["srt"];
+        
+        if (openPanel.runModal() == NSApplication.ModalResponse.OK) {
+            for url in openPanel.urls {
+                do {
+                    try self.dictionaryManager?.importFromURL(url)
+                } catch {
+                    print("Error importing file: \(error.localizedDescription)")
+                }
+            }
+        }
+    }
+    
+    @IBAction func appAction(_ sender: AnyObject) {
+        
+    }
+
+    
+    @IBAction func exitAction(_ sender: AnyObject) {
+        NSApplication.shared.terminate(self)
     }
 
 }

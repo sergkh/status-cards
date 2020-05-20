@@ -14,7 +14,7 @@ import Foundation
 // TODO: update it with https://stackoverflow.com/questions/35339277/make-swift-cocoa-app-launch-on-startup-on-os-x-10-11
 class LaunchOnLoginSupport {
     
-    func applicationIsInStartUpItems() -> Bool {
+    func applicationIsInStartUpItems() -> Bool {        
         return (itemReferencesInLoginItems().existingReference != nil)
     }
     

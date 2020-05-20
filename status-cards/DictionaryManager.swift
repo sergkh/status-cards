@@ -15,9 +15,11 @@ class DictionaryManager {
         self.managedContext = context
     }
     
-    func nextPair() -> Pair? {
+    func nextWord() -> Word? {
         // Fetching
-        let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Pair")
+        let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Word")
+        // request.predicate = NSPredicate(format: "knownPercent < %@", 100)
+        
         let sortByViewDate = NSSortDescriptor(key: "lastShown", ascending: true)
         let sortByViews = NSSortDescriptor(key: "shownTimes", ascending: true)
         
@@ -32,9 +34,9 @@ class DictionaryManager {
                 return nil
             }
             
-            let pair = res[0] as! Pair
-            pair.shownTimes += 1
-            pair.lastShown = Date().timeIntervalSince1970
+            let word = res[0] as! Word
+            word.shownTimes += 1
+            word.lastShown = Date().timeIntervalSince1970
             
             // TODO: do not save context on each read
             do {
@@ -43,16 +45,18 @@ class DictionaryManager {
                 print("Error saving context \(error.localizedDescription)")
             }
             
-            print("Got pair: \(pair.displayText())")
+            print("Got word: \(word.displayText())")
             
-            return pair
+            return word
         }
         
         return nil
     }
     
     func importFromURL(_ url: URL) throws {
-        if url.scheme == "file" {
+        if url.scheme == "file" && url.path.hasSuffix(".srt") {
+            try self.importSrt(fileName: url.path)
+        } else if url.scheme == "file" {
             try self.importFromFile(url.path, params: parseUrlParams(url))
         } else {
             print("URL is not supported Yet \(url)")
@@ -62,20 +66,29 @@ class DictionaryManager {
     func importFromFile(_ fileName: String, params: [String:String]) throws {
         print("Importing file: \(fileName)")
         
-        let fileContents = try? NSString(contentsOfFile:fileName, encoding: String.Encoding.utf8.rawValue)
+        let fileContents = try? String(contentsOfFile:fileName, encoding: .utf8)
         
         if let contents = fileContents {
             let fileLines = contents.components(separatedBy: "\n")
+            
             print("Got \(fileLines.count) lines in file")
-            
-            //let langLine = fileLines[0]
-            
-            //fromLang: Language, toLang: Language,
-            let fromLang = try findOrAddLang(params["from"] ?? "en")
-            let toLang = try findOrAddLang(params["to"] ?? "uk")
-            
+                        
             let allowedDelimeters = CharacterSet(charactersIn:":–=—")
             let spaces = CharacterSet.whitespaces
+                                    
+            var text = ""
+            for line in fileLines {
+                let pairsArray = line.components(separatedBy: allowedDelimeters as CharacterSet)
+                if pairsArray.count == 2 {
+                    text.append(pairsArray[0]);
+                    text.append(" ")
+                }
+            }
+            
+            let tagger = NSLinguisticTagger(tagSchemes: [.language], options: 0)
+            tagger.string = text
+            let lang = try! findOrAddLang(tagger.dominantLanguage ?? "en")
+            print("Detected language is: \(lang)")
             
             var importedCount = 0
             
@@ -92,11 +105,11 @@ class DictionaryManager {
                             let trimmedWord2 = t.trimmingCharacters(in: spaces)
                             
                             do {
-                                if try !trimmedWord1.isEmpty && !trimmedWord2.isEmpty && addPair(word1: trimmedWord1, lang1: fromLang, word2: trimmedWord2, lang2: toLang) {
+                                if try !trimmedWord1.isEmpty && !trimmedWord2.isEmpty && addWord(word: trimmedWord1, lang: lang, definition: trimmedWord2) {
                                     importedCount = importedCount + 1
                                 }
                             } catch {
-                                print("Error storing word pair: \(error.localizedDescription) for words '\(trimmedWord1)' – '\(trimmedWord2)'")
+                                print("Error storing words: \(error.localizedDescription) for words '\(trimmedWord1)' – '\(trimmedWord2)'")
                             }
                         }
                     }
@@ -112,39 +125,100 @@ class DictionaryManager {
         }
     }
     
-    func addPair(word1: String, lang1: Language, word2: String, lang2: Language) throws -> Bool {
-        let word1Entity = try findWord(word: word1, lang: lang1) ?? Word(word: word1, lang: lang1, context: managedContext)
-        let word2Entity = try findWord(word: word2, lang: lang2) ?? Word(word: word2, lang: lang2, context: managedContext)
-        
-        let existingPair = try findPair(word1: word1Entity, word2: word2Entity)
+    func importSrt(fileName: String) throws {
+        let fileContents = try? stripSrt(String(contentsOfFile:fileName, encoding: .utf8))
 
-        if (existingPair != nil) {
+        // see: https://developer.apple.com/documentation/naturallanguage/identifying_parts_of_speech
+        if let text = fileContents {
+            let tagger = NSLinguisticTagger(tagSchemes: [.language, .tokenType, .lexicalClass, .lemma, .nameType], options: 0)
+            
+            let options: NSLinguisticTagger.Options = [.omitPunctuation, .omitWhitespace, .joinNames]
+            
+            tagger.string = text
+            
+            let lang = try! findOrAddLang(tagger.dominantLanguage ?? "en")
+            print("The Language is: \(lang)")
+            
+            let range = NSRange(location: 0, length: text.utf16.count)
+                            
+            var candidates: [String:NSRange] = [:]
+            var ignored: [String: Int] = [:]
+            
+            // Find words only of specific classes
+            // let tags: [NSLinguisticTag] = [.V, .placeName, .organizationName]
+            tagger.enumerateTags(in: range, unit: .word, scheme: .lexicalClass, options: options) { (tag, tokenRange, stop) in
+                if let tag = tag {
+                    let word = (text as NSString).substring(with: tokenRange)
+                    if ["Verb", "Noun", "Adverb", "Adjective", "OtherWord"].contains(tag.rawValue) {
+                        candidates[word] = tokenRange
+                    } else {
+                        ignored[word] = 1
+                    }
+                }
+            }
+                            
+            // remove personal names and places
+            let tags: [NSLinguisticTag] = [.personalName, .placeName, .organizationName]
+            tagger.enumerateTags(in: range, unit: .word, scheme: .nameType, options: options) { (tag, tokenRange, stop) in
+                if let tag = tag, tags.contains(tag) {
+                    let name = (text as NSString).substring(with: tokenRange)
+                    candidates.removeValue(forKey: name)
+                }
+            }
+            
+            var ranges: [NSRange:String] = [:]
+            
+            for (word, range) in candidates {
+                ranges[range] = word
+            }
+            
+            print("Ignored words \(ignored.keys.joined(separator: ", "))")
+            
+            tagger.enumerateTags(in: range, unit: .word, scheme: .lemma, options: options) { (tag, tokenRange, stop) in
+                if let lemma = tag?.rawValue, let word = ranges[tokenRange] {
+                    let known = try? findKnownWord(word: lemma, lang: lang)
+                    let learning = try? findWord(word: lemma, lang: lang)
+                    
+                    if known == nil && learning == nil {
+                        print("New word: \(word) - \(lemma)")
+                    } else {
+                        print("Old: \(lemma)")
+                    }
+                }
+            }
+        }
+    }
+    
+    func importFromLingualeo(login: String, pass: String) throws {
+        let url = URL(string: "https://api.lingualeo.com/api/login")
+        var request = URLRequest(url: url!)
+        request.httpMethod = "POST"
+        request.cachePolicy = NSURLRequest.CachePolicy.reloadIgnoringCacheData
+        /*
+        NSURLConnection.sendAsynchronousRequest(request, queue: OperationQueue.main) {(response, data, error) in
+            print(data!)
+            
+          //curl -X POST -H 'Content-Type: application/json' --data '{ "page": "1", "sortBy": "date", "filter": "all", "groupId": "dictionary"}' https://lingualeo.com/userdict/json
+        }*/
+        
+    }
+    
+    func addWord(word: String, lang: Language, definition: String) throws -> Bool {
+        let existingWord = try findWord(word: word, lang: lang)
+    
+        if (existingWord != nil) {
             return false
         }
-        
-        _ = Pair(word1: word1Entity, word2: word2Entity, context: managedContext)
-        
+    
+        _ = Word(word: word, definition: definition, lang: lang, context: managedContext)
         try managedContext.save()
         
         return true
     }
-    
-    func findPair(word1: Word, word2: Word) throws -> Pair? {
-        let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Pair")
-        request.predicate = NSPredicate(format: "word1 == %@ AND word2 == %@", word1, word2)
         
-        let pairRes = try managedContext.fetch(request)
-        
-        if pairRes.count == 0 {
-            return nil
-        }
-        
-        return pairRes[0] as? Pair
-    }
-    
     func findWord(word: String, lang: Language) throws -> Word? {
         let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Word")
-        request.predicate = NSPredicate(format: "word == %@", word)
+        request.predicate = NSPredicate(format: "word == %@", word.lowercased())
         
         let wordsRes = try managedContext.fetch(request)
         
@@ -153,6 +227,32 @@ class DictionaryManager {
         }
             
         return wordsRes[0] as? Word
+    }
+    
+    func addKnownWord(word: String, lang: Language) throws -> Bool {
+        let existingWord = try findKnownWord(word: word, lang: lang)
+    
+        if (existingWord != nil) {
+            return false
+        }
+    
+        _ = KnownWord(word: word, lang: lang, context: managedContext)
+        try managedContext.save()
+        
+        return true
+    }
+    
+    func findKnownWord(word: String, lang: Language) throws -> KnownWord? {
+        let request = NSFetchRequest<NSFetchRequestResult>(entityName: "KnownWord")
+        request.predicate = NSPredicate(format: "word == %@", word.lowercased())
+        
+        let wordsRes = try managedContext.fetch(request)
+        
+        if wordsRes.count == 0 {
+            return nil
+        }
+            
+        return wordsRes[0] as? KnownWord
     }
     
     func findOrAddLang(_ iso: String) throws -> Language {
@@ -204,5 +304,13 @@ class DictionaryManager {
         }
         
         return dict
+    }
+    
+    fileprivate func stripSrt(_ text: String) -> String {
+        text.lines.filter { (line) -> Bool in
+            !(line.regexpMatch("^\\d+") || line.regexpMatch("^\\d{2}:d{2}:d{2}.*")) // filter out: 1 and 00:02:10,244 --> 00:02:12,788
+        }.map { (line) -> String in
+            line.removingRegexMatches(pattern: "</?.+?>") // remove tags
+        }.joined(separator:" ")
     }
 }
