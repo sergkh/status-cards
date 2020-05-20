@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VariablesViewState
+   version = "1.0">
+   <ContextStates>
+      <ContextState
+         contextName = "DictionaryManager.addPair(word1 : String, lang1 : Language, word2 : String, lang2 : Language) throws -&gt; Bool:DictionaryManager.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "word2Entity.word">
+            </PersistentString>
+            <PersistentString
+               value = "word1Entity.word">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "closure #1 in AppDelegate.applicationDidFinishLaunching(_:):AppDelegate.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "String(word)">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "DictionaryManager.importFromFile(_:params:):DictionaryManager.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "tagger.dominantLanguage!">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+   </ContextStates>
+</VariablesViewState>

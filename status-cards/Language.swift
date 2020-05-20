@@ -13,10 +13,11 @@ import CoreData
 class Language: NSManagedObject {
 
     @NSManaged var iso: String
+    @NSManaged var native: Bool
     @NSManaged var pairs: NSSet
     
     convenience init(iso: String, context: NSManagedObjectContext!) {
-        self.init(entity: NSEntityDescription.entityForName("Language", inManagedObjectContext: context)!, insertIntoManagedObjectContext: context)
+        self.init(entity: NSEntityDescription.entity(forEntityName: "Language", in: context)!, insertInto: context)
         self.iso = iso
     }
 }

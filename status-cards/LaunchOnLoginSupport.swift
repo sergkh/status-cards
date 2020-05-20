@@ -10,49 +10,51 @@ import Foundation
 
 // Loaded from: http://stackoverflow.com/questions/26475008/swift-getting-a-mac-app-to-launch-on-startup
 
+
+// TODO: update it with https://stackoverflow.com/questions/35339277/make-swift-cocoa-app-launch-on-startup-on-os-x-10-11
 class LaunchOnLoginSupport {
     
-    func applicationIsInStartUpItems() -> Bool {
+    func applicationIsInStartUpItems() -> Bool {        
         return (itemReferencesInLoginItems().existingReference != nil)
     }
     
     func toggleLaunchAtStartup() {
         let itemReferences = itemReferencesInLoginItems()
         let shouldBeToggled = (itemReferences.existingReference == nil)
-        let loginItemsRef = LSSharedFileListCreate(nil, kLSSharedFileListSessionLoginItems.takeRetainedValue(), nil).takeRetainedValue() as LSSharedFileListRef?
+        let loginItemsRef = LSSharedFileListCreate(nil, kLSSharedFileListSessionLoginItems.takeRetainedValue(), nil).takeRetainedValue() as LSSharedFileList?
         
         if loginItemsRef != nil {
             if shouldBeToggled {
-                if let appUrl : CFURLRef = NSURL.fileURLWithPath(NSBundle.mainBundle().bundlePath) {
+                if let appUrl : CFURL = URL(fileURLWithPath: Bundle.main.bundlePath) as CFURL? {
                     LSSharedFileListInsertItemURL(loginItemsRef, itemReferences.lastReference, nil, nil, appUrl, nil, nil)
-                    println("Application was added to login items")
+                    print("Application was added to login items")
                 }
             } else {
                 if let itemRef = itemReferences.existingReference {
                     LSSharedFileListItemRemove(loginItemsRef,itemRef);
-                    println("Application was removed from login items")
+                    print("Application was removed from login items")
                 }
             }
         }
     }
     
-    private func itemReferencesInLoginItems() -> (existingReference: LSSharedFileListItemRef?, lastReference: LSSharedFileListItemRef?) {
-        var itemUrl : UnsafeMutablePointer<Unmanaged<CFURL>?> = UnsafeMutablePointer<Unmanaged<CFURL>?>.alloc(1)
+    fileprivate func itemReferencesInLoginItems() -> (existingReference: LSSharedFileListItem?, lastReference: LSSharedFileListItem?) {
+        let itemUrl : UnsafeMutablePointer<Unmanaged<CFURL>?> = UnsafeMutablePointer<Unmanaged<CFURL>?>.allocate(capacity: 1)
         
-        if let appUrl : NSURL = NSURL.fileURLWithPath(NSBundle.mainBundle().bundlePath) {
-            let loginItemsRef = LSSharedFileListCreate(nil, kLSSharedFileListSessionLoginItems.takeRetainedValue(), nil).takeRetainedValue() as LSSharedFileListRef?
+        if let appUrl : URL = URL(fileURLWithPath: Bundle.main.bundlePath) {
+            let loginItemsRef = LSSharedFileListCreate(nil, kLSSharedFileListSessionLoginItems.takeRetainedValue(), nil).takeRetainedValue() as LSSharedFileList?
             
             if loginItemsRef != nil {
                 let loginItems: NSArray = LSSharedFileListCopySnapshot(loginItemsRef, nil).takeRetainedValue() as NSArray
-                let lastItemRef: LSSharedFileListItemRef = loginItems.lastObject as! LSSharedFileListItemRef
+                let lastItemRef: LSSharedFileListItem = loginItems.lastObject as! LSSharedFileListItem
                 
-                for var i = 0; i < loginItems.count; ++i {
-                    let currentItemRef: LSSharedFileListItemRef = loginItems.objectAtIndex(i) as! LSSharedFileListItemRef
+                for i in 0 ..< loginItems.count + 1 {
+                    let currentItemRef: LSSharedFileListItem = loginItems.object(at: i) as! LSSharedFileListItem
                     
                     if LSSharedFileListItemResolve(currentItemRef, 0, itemUrl, nil) == noErr {
-                        if let urlRef: NSURL =  itemUrl.memory?.takeRetainedValue() {
+                        if let urlRef: URL =  itemUrl.pointee?.takeRetainedValue() as URL? {
                         
-                            if urlRef.isEqual(appUrl) {
+                            if urlRef == appUrl {
                                 return (currentItemRef, lastItemRef)
                             }
                         }

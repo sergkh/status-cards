@@ -7,10 +7,11 @@
 //
 
 import Cocoa
+import CoreData
+import Foundation
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
-
     var leftToUpdateSources = 10
     
     let sourcesKey = "sources"
@@ -18,11 +19,18 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     let panelEnabled = "panelEnabled"
     let launchAtLoginEnabled = "launchAtLoginEnabled"
     
-    var statusItem: NSStatusItem
     var dictionaryManager: DictionaryManager?
-    var repeatingTimer: NSTimer?
+    var repeatingTimer: Timer?
     
-    let timerTolerance = NSTimeInterval(60*5) // 5 min
+    let timerTolerance = TimeInterval(60*5) // 5 min
+    
+    lazy var coreData = CoreDataStack()
+    
+    var statusItem: NSStatusItem?
+    @IBOutlet weak var statusBarMenu: NSMenu?
+    @IBOutlet weak var importDictMenuItem: NSMenuItem?
+    @IBOutlet weak var settingsMenuItem: NSMenuItem?
+    @IBOutlet weak var exitMenuItem: NSMenuItem?
     
     override init() {
         let defaults = [
@@ -31,145 +39,151 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             launchAtLoginEnabled: false
         ];
         
-        NSUserDefaults.standardUserDefaults().registerDefaults(defaults)
-        let length: CGFloat = -1
-        statusItem = NSStatusBar.systemStatusBar().statusItemWithLength(length)
+        UserDefaults.standard.register(defaults: defaults)
     }
 
-    func changePairTimerActivated() {
-        
-        println("Timer action started")
-        
+    @objc func changePairTimerActivated() {
         let dictionary = self.dictionaryManager
     
-        let maybeWord = dictionary?.nextPair()
-
-        println("Maybe word: \(maybeWord)")
+        let maybeWord = dictionary?.nextWord()
         
-        let prefs = NSUserDefaults.standardUserDefaults()
+        let prefs = UserDefaults.standard
     
         if let word = maybeWord {
             
-            if prefs.boolForKey(notificationsEnabled) {
+            if prefs.bool(forKey: notificationsEnabled) {
                 let notification = NSUserNotification()
                 notification.title = word.word
-                notification.informativeText = word.translationText()
+                notification.informativeText = word.definition
                 // no sound: notification.soundName = NSUserNotificationDefaultSoundName;
-                println("Notifications are enabled")
-                NSUserNotificationCenter.defaultUserNotificationCenter().deliverNotification(notification)
+                print("Notifications are enabled")
+                NSUserNotificationCenter.default.deliver(notification)
             } else {
-                println("Notifications are disabled")
+                print("Notifications are disabled")
             }
     
-            if prefs.boolForKey(panelEnabled) {
-                println("Setting status")
-                self.statusItem.title = String(format: "%@ – %@", word.word, word.translationText())
+            if prefs.bool(forKey: panelEnabled) {
+                print("Setting status")
+                self.statusItem?.button?.title = word.displayText()
             } else {
-                println("Panel is disabled");
+                print("Panel is disabled");
             }
         } else {
-            println("Word is not obtained")
+            print("Word is not obtained")
         }
+        
+        leftToUpdateSources -= 1
     
-        if(leftToUpdateSources-- == 0) {
+        if(leftToUpdateSources == 0) {
             leftToUpdateSources = 10;
             self.updateSources()
         }
-        
-        //let delayTime = dispatch_time(DISPATCH_TIME_NOW, Int64(5000 * Double(NSEC_PER_SEC)))
-
-        //dispatch_after(delayTime, dispatch_get_main_queue()) {
-        //    self.changePairTimerActivated()
-        //}
-        
-        self.repeatingTimer?.invalidate()
-        self.repeatingTimer = nil;
-
-        self.repeatingTimer = NSTimer.scheduledTimerWithTimeInterval(nextTimerInterval(),
-                                                                     target: self,
-                                                                     selector: "changePairTimerActivated",
-                                                                     userInfo: nil,
-                                                                     repeats: true)
-        self.repeatingTimer?.tolerance = timerTolerance
     }
     
-    func addSource(url: NSURL) {
-        var error: NSError? = nil
+    func startTimer() {
+        self.repeatingTimer = Timer.scheduledTimer(timeInterval: TimeInterval(20), // 6*60
+                                                   target: self,
+                                                   selector: #selector(AppDelegate.changePairTimerActivated),
+                                                   userInfo: nil,
+                                                   repeats: true)
         
-        self.dictionaryManager?.importFromURL(url, error: &error)
-    
-        // add source to settings if not added already
-        let prefs = NSUserDefaults.standardUserDefaults()
-        let sourcesOpt = prefs.stringArrayForKey(sourcesKey) as? [String]
-        var sources = sourcesOpt ?? [String]()
-        let newSource = url.absoluteString!
-    
-        for path in sources {
-            if (path == newSource) {
-                return ;
-            }
-        }
-    
-        sources.append(newSource)
-    
-        prefs.setObject(sources, forKey: sourcesKey)
+        self.repeatingTimer?.tolerance = timerTolerance
 
-        prefs.synchronize()
+    }
     
-        println("Added new source \(url)")
+    func addSource(_ url: URL) {
+        do {
+            try self.dictionaryManager?.importFromURL(url)
+    
+            // add source to settings if not added already
+            let prefs = UserDefaults.standard
+            let sourcesOpt = prefs.stringArray(forKey: sourcesKey)
+            var sources = sourcesOpt ?? [String]()
+            let newSource = url.absoluteString
+    
+            for path in sources {
+                if (path == newSource) {
+                    return ;
+                }
+            }
+    
+            sources.append(newSource)
+    
+            prefs.set(sources, forKey: sourcesKey)
+
+            prefs.synchronize()
+    
+            print("Added new source \(url)")
+        } catch {
+            print("Error adding source: \(error.localizedDescription)")
+        }
     }
     
     func updateSources() {
-        let prefs = NSUserDefaults.standardUserDefaults()
-        let sources = prefs.stringArrayForKey(sourcesKey) as! Array<String>
+        let prefs = UserDefaults.standard
+        if let sources = prefs.stringArray(forKey: sourcesKey) {
         
-        println("Updating sources, count: \(sources.count)")
+            print("Updating sources, count: \(sources.count)")
         
-        for path in sources {
-            println("Processing source: \(path)")
-            var error: NSError? = nil
-            if let url = NSURL(string: path) {
-                //self.dictionaryManager?.importFromURL(url, fromLang: 0, toLang: 0, error:&error);
+            for path in sources {
+                print("Processing source: \(path)")
+                //if let url = NSURL(string: path) {
+                    //self.dictionaryManager?.importFromURL(url, fromLang: 0, toLang: 0, error:&error);
+                //}
             }
         }
     }
-    
-    func nextTimerInterval() -> NSTimeInterval {
-        let interval = NSTimeInterval(60 + arc4random() % (60*5))
+
+    func applicationDidFinishLaunching(_ aNotification: Notification) {
+        // NSRunningApplication.current().hide()
         
-        let formatter = NSDateFormatter()
-        formatter.dateFormat = "HH:mm:ss"
-        println("Next show up at: \(formatter.stringFromDate(NSDate(timeIntervalSinceNow: interval))) +\(interval)")
-        
-        return interval
-    }
-    
-    func applicationDidFinishLaunching(aNotification: NSNotification) {
-        let context = self.managedObjectContext!
-        dictionaryManager = DictionaryManager(context: context)
+        coreData.load { 
+            self.dictionaryManager = DictionaryManager(context: self.coreData.managedObjectContext)
+            self.startTimer() // start the timer
+            
+            if let filepath = Bundle.main.path(forResource: "basic_en", ofType: "txt") {
+                do {
+                    let fileContents = try? String(contentsOfFile:filepath, encoding: .utf8)
+                               
+                    if let file = fileContents {
+                       let lang = try self.dictionaryManager?.findOrAddLang("en")
+                       
+                       for word in file.split(separator: ",", omittingEmptySubsequences: true) {
+                        
+                            let old = try self.dictionaryManager?.addKnownWord(word: String(word), lang: lang!)
+                            if (old != nil) {
+                                break ;
+                            }
+                       }
+                   }
+                } catch {
+                    
+                }
+            }
+        }
         
         // Check autostart
         let autostart = LaunchOnLoginSupport()
-        let autostartEnabled = NSUserDefaults.standardUserDefaults().boolForKey(launchAtLoginEnabled)
+        let autostartEnabled = UserDefaults.standard.bool(forKey: launchAtLoginEnabled)
         
         if(autostartEnabled != autostart.applicationIsInStartUpItems()) {
             autostart.toggleLaunchAtStartup()
-            println("Toggled autostart status to: \(autostart.applicationIsInStartUpItems())")
+            print("Toggled autostart status to: \(autostart.applicationIsInStartUpItems())")
         }
         
-        let languages: NSArray? = NSLocale.ISOLanguageCodes()
-        let locale = NSLocale.autoupdatingCurrentLocale()
+        //let languages: NSArray? = Locale.isoLanguageCodes as NSArray?
+        //let locale = Locale.autoupdatingCurrent
+    }
+    
+    override func awakeFromNib() {
+        super.awakeFromNib()
         
-        for code in languages! {
-            println("\(code) – \(locale.displayNameForKey(NSLocaleIdentifier, value: code))")
-        }
-        
-        statusItem.title = "test"
-        
-        self.changePairTimerActivated() // start the timer
+        statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+        statusItem?.button?.title = "📔"
+        statusItem?.menu = statusBarMenu
     }
 
-    func applicationWillTerminate(aNotification: NSNotification) {
+    func applicationWillTerminate(_ aNotification: Notification) {
         // Insert code here to tear down your application
         self.repeatingTimer?.invalidate();
         self.repeatingTimer = nil
@@ -177,13 +191,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     // UI handlers
     
-    @IBAction func openAction(sender: AnyObject) {
+    @IBAction func openAction(_ sender: AnyObject) {
         // Uncomment to clean up dictionay before import:
         //[self.dictionaryManager removeAll];
         
         let openPanel = NSOpenPanel()
         
-        openPanel.title = "Choose a file" // localize me
+        openPanel.title = "Choose a dictionary" // TODO: localize me
         openPanel.showsResizeIndicator = true
         openPanel.showsHiddenFiles = false
         openPanel.canChooseDirectories = false
@@ -191,146 +205,41 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         openPanel.allowsMultipleSelection = false
         //openPanel.allowedFileTypes = ["txt"];
         
-        if (openPanel.runModal() == NSFileHandlingPanelOKButton) {
-            let selection = openPanel.URLs[0] as! NSURL
+        if (openPanel.runModal() == NSApplication.ModalResponse.OK) {
+            let selection = openPanel.urls[0] 
             self.addSource(selection) // TODO: add languages here
         }        
     }
-
-    // MARK: - Core Data stack
-
-    lazy var applicationDocumentsDirectory: NSURL = {
-        // The directory the application uses to store the Core Data store file. This code uses a directory named "org.sergkh.status_cards" in the user's Application Support directory.
-        let urls = NSFileManager.defaultManager().URLsForDirectory(.ApplicationSupportDirectory, inDomains: .UserDomainMask)
-        let appSupportURL = urls[urls.count - 1] as! NSURL
-        return appSupportURL.URLByAppendingPathComponent("org.sergkh.status_cards")
-    }()
-
-    lazy var managedObjectModel: NSManagedObjectModel = {
-        // The managed object model for the application. This property is not optional. It is a fatal error for the application not to be able to find and load its model.
-        let modelURL = NSBundle.mainBundle().URLForResource("status_cards", withExtension: "momd")!
-        return NSManagedObjectModel(contentsOfURL: modelURL)!
-    }()
-
-    lazy var persistentStoreCoordinator: NSPersistentStoreCoordinator? = {
-        // The persistent store coordinator for the application. This implementation creates and return a coordinator, having added the store for the application to it. (The directory for the store is created, if necessary.) This property is optional since there are legitimate error conditions that could cause the creation of the store to fail.
-        let fileManager = NSFileManager.defaultManager()
-        var shouldFail = false
-        var error: NSError? = nil
-        var failureReason = "There was an error creating or loading the application's saved data."
-
-        // Make sure the application files directory is there
-        let propertiesOpt = self.applicationDocumentsDirectory.resourceValuesForKeys([NSURLIsDirectoryKey], error: &error)
-        if let properties = propertiesOpt {
-            if !properties[NSURLIsDirectoryKey]!.boolValue {
-                failureReason = "Expected a folder to store application data, found a file \(self.applicationDocumentsDirectory.path)."
-                shouldFail = true
-            }
-        } else if error!.code == NSFileReadNoSuchFileError {
-            error = nil
-            fileManager.createDirectoryAtPath(self.applicationDocumentsDirectory.path!, withIntermediateDirectories: true, attributes: nil, error: &error)
-        }
+    
+    @IBAction func openTextAction(_ sender: AnyObject) {
+        let openPanel = NSOpenPanel()
         
-        // Create the coordinator and store
-        var coordinator: NSPersistentStoreCoordinator?
-        if !shouldFail && (error == nil) {
-            coordinator = NSPersistentStoreCoordinator(managedObjectModel: self.managedObjectModel)
-            let url = self.applicationDocumentsDirectory.URLByAppendingPathComponent("status_cards.storedata")
-            if coordinator!.addPersistentStoreWithType(NSXMLStoreType, configuration: nil, URL: url, options: nil, error: &error) == nil {
-                coordinator = nil
-            }
-        }
+        openPanel.title = "Choose a subtitles file" // TODO: localize me
+        openPanel.showsResizeIndicator = true
+        openPanel.showsHiddenFiles = false
+        openPanel.canChooseDirectories = false
+        openPanel.canCreateDirectories = false
+        openPanel.allowsMultipleSelection = false
+        openPanel.allowedFileTypes = ["srt"];
         
-        if shouldFail || (error != nil) {
-            // Report any error we got.
-            var dict = [String: AnyObject]()
-            dict[NSLocalizedDescriptionKey] = "Failed to initialize the application's saved data"
-            dict[NSLocalizedFailureReasonErrorKey] = failureReason
-            if error != nil {
-                dict[NSUnderlyingErrorKey] = error
-            }
-            error = NSError(domain: "YOUR_ERROR_DOMAIN", code: 9999, userInfo: dict)
-            NSApplication.sharedApplication().presentError(error!)
-            return nil
-        } else {
-            return coordinator
-        }
-    }()
-
-    lazy var managedObjectContext: NSManagedObjectContext? = {
-        // Returns the managed object context for the application (which is already bound to the persistent store coordinator for the application.) This property is optional since there are legitimate error conditions that could cause the creation of the context to fail.
-        let coordinator = self.persistentStoreCoordinator
-        if coordinator == nil {
-            return nil
-        }
-        var managedObjectContext = NSManagedObjectContext()
-        managedObjectContext.persistentStoreCoordinator = coordinator
-        return managedObjectContext
-    }()
-
-    // MARK: - Core Data Saving and Undo support
-
-    @IBAction func saveAction(sender: AnyObject!) {
-        // Performs the save action for the application, which is to send the save: message to the application's managed object context. Any encountered errors are presented to the user.
-        if let moc = self.managedObjectContext {
-            if !moc.commitEditing() {
-                NSLog("\(NSStringFromClass(self.dynamicType)) unable to commit editing before saving")
-            }
-            var error: NSError? = nil
-            if moc.hasChanges && !moc.save(&error) {
-                NSApplication.sharedApplication().presentError(error!)
-            }
-        }
-    }
-
-    func windowWillReturnUndoManager(window: NSWindow) -> NSUndoManager? {
-        // Returns the NSUndoManager for the application. In this case, the manager returned is that of the managed object context for the application.
-        if let moc = self.managedObjectContext {
-            return moc.undoManager
-        } else {
-            return nil
-        }
-    }
-
-    func applicationShouldTerminate(sender: NSApplication) -> NSApplicationTerminateReply {
-        // Save changes in the application's managed object context before the application terminates.
-        
-        if let moc = managedObjectContext {
-            if !moc.commitEditing() {
-                NSLog("\(NSStringFromClass(self.dynamicType)) unable to commit editing to terminate")
-                return .TerminateCancel
-            }
-            
-            if !moc.hasChanges {
-                return .TerminateNow
-            }
-            
-            var error: NSError? = nil
-            if !moc.save(&error) {
-                // Customize this code block to include application-specific recovery steps.
-                let result = sender.presentError(error!)
-                if (result) {
-                    return .TerminateCancel
-                }
-                
-                let question = NSLocalizedString("Could not save changes while quitting. Quit anyway?", comment: "Quit without saves error question message")
-                let info = NSLocalizedString("Quitting now will lose any changes you have made since the last successful save", comment: "Quit without saves error question info");
-                let quitButton = NSLocalizedString("Quit anyway", comment: "Quit anyway button title")
-                let cancelButton = NSLocalizedString("Cancel", comment: "Cancel button title")
-                let alert = NSAlert()
-                alert.messageText = question
-                alert.informativeText = info
-                alert.addButtonWithTitle(quitButton)
-                alert.addButtonWithTitle(cancelButton)
-                
-                let answer = alert.runModal()
-                if answer == NSAlertFirstButtonReturn {
-                    return .TerminateCancel
+        if (openPanel.runModal() == NSApplication.ModalResponse.OK) {
+            for url in openPanel.urls {
+                do {
+                    try self.dictionaryManager?.importFromURL(url)
+                } catch {
+                    print("Error importing file: \(error.localizedDescription)")
                 }
             }
         }
-        // If we got here, it is time to quit.
-        return .TerminateNow
+    }
+    
+    @IBAction func appAction(_ sender: AnyObject) {
+        
+    }
+
+    
+    @IBAction func exitAction(_ sender: AnyObject) {
+        NSApplication.shared.terminate(self)
     }
 
 }

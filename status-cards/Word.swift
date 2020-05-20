@@ -12,26 +12,26 @@ import CoreData
 @objc(Word)
 class Word: NSManagedObject {
 
-    @NSManaged var lastShown: NSTimeInterval
-    @NSManaged var learned: Float
-    @NSManaged var shownTimes: Int32
     @NSManaged var word: String
+    @NSManaged var definition: String
+    @NSManaged var knownPercent: Int16
+    @NSManaged var lastShown: TimeInterval
+    @NSManaged var shownTimes: Int32
     @NSManaged var language: Language
-    @NSManaged var translation: NSMutableSet
+    @NSManaged var added: Date
 
-    convenience init(word: String,  lang: Language, context: NSManagedObjectContext) {
-        self.init(entity: NSEntityDescription.entityForName("Word", inManagedObjectContext: context)!, insertIntoManagedObjectContext: context)
-        self.word = word
+    convenience init(word: String, definition: String, lang: Language, context: NSManagedObjectContext) {
+        self.init(entity: NSEntityDescription.entity(forEntityName: "Word", in: context)!, insertInto: context)
+        self.word = word.lowercased()
         self.language = lang
+        self.definition = definition
+        self.knownPercent = 0
+        self.shownTimes = 0
+        self.added = Date.init()
     }
     
-    func translationText() -> String {
-        var str = ""
-        //translation.allObjects
-        for t in translation {
-            str = str + t.word + ", "
-        }
-
-        return str; //String(format: "Results %d", translation.count)
+    func displayText() -> String {
+        return word + " – " + definition;
     }
+    
 }
